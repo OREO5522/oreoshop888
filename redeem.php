@@ -1,65 +1,55 @@
-<?php
-require_once 'a_func.php';
-
-
-
-function dd_return($status, $message) {
-    $json = ['message' => $message];
-    if ($status) {
-        http_response_code(200);
-        die(json_encode($json));
-    }else{
-        http_response_code(400);
-        die(json_encode($json));
-    }
-}
-
-// //////////////////////////////////////////////////////////////////////////
-
-header('Content-Type: application/json; charset=utf-8;');
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_SESSION['id'])) {
-        $p = dd_q("SELECT * FROM users WHERE id = ? ", [$_SESSION['id']]);
-        $plr = $p->fetch(PDO::FETCH_ASSOC);
-        if($_POST['link'] != ""){
-            $find = dd_q("SELECT * FROM redeem WHERE code = ? ", [$_POST['link']]);
-            if($find->rowCount() >= 1){
-                $code = $find->fetch(PDO::FETCH_ASSOC);
-                if($code['count'] < $code['max_count']){
-                    $re_his = dd_q("SELECT * FROM redeem_his WHERE code = ? AND uid = ?  ", [$_POST['link'], $_SESSION['id']]);
-                    if($re_his->rowCount() < 1){
-                        $upt = dd_q("UPDATE users SET point = point + ? WHERE id = ? ", [$code['prize'], $_SESSION['id']]);
-                        $upt2 = dd_q("UPDATE redeem SET count = count + 1  WHERE id = ? ", [$code['id']]);
-                        $insert = dd_q("INSERT INTO redeem_his (date,code,uid) VALUES (NOW() , ? , ? )", [$code['code'], $_SESSION['id']]);
-                        if($insert AND $upt AND $upt2){
-                            dd_return(true,   "รับรางวัลสำเร็จ");
-                        }else{
-                            dd_return(false,   "ERROR redeem API โปรดติดต่อเจ้าของเว็บนี้!");
-                        }
-                    }else{
-                        dd_return(false,   "คุณกรอกโค้ดนี้ไปแล้ว");
-                    }
-                }else{
-                    dd_return(false,   "โค้ดนี้มีการใช้งานครบแล้ว");
-                }
-            }else{
-                dd_return(false,   "โค้ดนี้ไม่มีในระบบ");
-            }
-        }
-    }else{
-    dd_return(false,"เข้าสู่ระบบก่อนทำรายการ");
-    }
-}else{
-dd_return(false,  "Method '{$_SERVER['REQUEST_METHOD']}' not allowed!");
-}
-
-
-
-
-
-
-
-
-
-?>
+<div class="container-fluid p-4">
+    <div class="container-sm  ps-4 pe-4">
+        <div class="container-fluid bg-white p-4">
+            <div class="col-lg-7 m-auto">
+            <h1 class="text-strongest text-main" data-aos="fade-right" data-aos-duration="500"><i class="fa-duotone fa-code"></i> &nbsp;REDEEM (เติมโค้ด)</h1>
+            <div data-aos="fade-right" data-aos-duration="600" >
+                <hr class="mt-1 mb-2">
+                <h5 class="text-black m-0"><i class="fa-regular fa-gift"></i>&nbsp;กรอกโค้ดเพื่อรับรางวัลจากเว็บของเรา</h5>
+            </div>
+            <center class="mt-4 mb-2">
+                <div class="col-lg-7" data-aos="fade-down" data-aos="700">
+                    <img src="assets/icon/unboxing.png"  class="img-fluid" style="max-height: 250px;">
+                </div>
+            </center>
+            <div data-aos="fade-down" data-aos-duration="750">
+                <center><small class="text-black ">* แต่ละโค้ดสามารถใช้งานได้หนึ่งครั้งต่อหนึ่งบัญชี</small></center>
+                <input type="text" id="link" class="form-control text-center mt-1" style="border-radius: 20px;" placeholder="กรอกโค้ดที่นี่" >
+            </div>
+            <button class="bg-main-gra btn mt-2 text-white w-100" id="redeem-btn" style="border-radius: 20px;" data-aos="fade-up" data-aos-duration="800">ยืนยันการเติมโค้ด</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $("#redeem-btn").click(function(){
+        var formData = new FormData();
+        formData.append('link'  , $("#link").val());
+        $.ajax({
+            type: 'POST',
+            url: 'system/redeem.php',
+            data:formData,
+            contentType: false,
+            processData: false,   
+        }).done(function(res){
+            result = res;
+            Swal.fire({
+                icon: 'success',
+                title: 'สำเร็จ',
+                text: result.message
+            }).then(function() {
+                    window.location = "?page=<?php echo $_GET['page'];?>";
+            });
+        }).fail(function(jqXHR){
+            console.log(jqXHR);
+            res = jqXHR.responseJSON;
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด',
+                text: res.message
+            })
+            //console.clear();
+        });
+        // $("#save_btn").attr("data-id") <- id user
+    });
+</script>
