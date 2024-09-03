@@ -13,6 +13,7 @@ if (isset($_SESSION['id'])) {
 }
 $get_static = dd_q("SELECT * FROM static");
 $static = $get_static->fetch(PDO::FETCH_ASSOC);
+if (isset($_GET['page'])) {
 // $config["pri_color"]   = "#FF2B2B";
 // $config["sec_color"]  = "#9A0D0D";
 ?>
@@ -23,14 +24,10 @@ $static = $get_static->fetch(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    
     <meta property="og:title" content="<?php echo $config['name']; ?> - ยินดีต้อนรับ">
     <meta property="og:type" content="website">
     <meta property="og:url" content="<?= $_SERVER['SERVER_NAME'] ?>">
-	 <meta property="og:image" content="https://gifdb.com/images/high/cool-anime-yui-hirasawa-k-on-b90459ws3s9us66w.gif" />
-    <meta name="theme-color" content="#5ACCD0">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@yosiket" />
     <meta name="twitter:card" content="summary_large_image">
     <meta property="og:image" content="<?php echo $config['bg3']; ?>">
     <meta property="og:description" content="<?php echo $config['des']; ?>">
@@ -45,7 +42,7 @@ $static = $get_static->fetch(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <script src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <!-- <link rel="stylesheet" href="system/gshake/css/box.css"> -->
-    <!--<script type="text/javascript" src="system/js/main.js"></script> -->
+    <script type="text/javascript" src="system/js/main.js"></script>
     <link href="https://kit-pro.fontawesome.com/releases/v6.2.0/css/pro.min.css" rel="stylesheet">
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -73,10 +70,8 @@ $static = $get_static->fetch(PDO::FETCH_ASSOC);
 
         .owl-items img {
             border-radius: 25px !important;
-            animation: glow 1s infinite ease-in-out;
-
+            animation: glow 2s infinite ease-in-out;
         }
-
         body {
             background-image: url('<?= $config['bg2'] ?>');
             background-repeat: no-repeat;
@@ -85,15 +80,16 @@ $static = $get_static->fetch(PDO::FETCH_ASSOC);
             background-size: cover;
             overflow-x: hidden;
         }
+
     </style>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-white mt-0 shadow-sm mb-0">
-        <div class="container-sm pt-4 pb-4 ps-4 pe-4 ">
-            <a class="navbar-brand" href="/?page=home"><img src="<?= $config['logo'] ?>" height="80px" width="auto"></a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white mt-0 shadow-sm mb-0">
+        <div class="container-sm  pt-4 pb-4 ps-4 pe-4 ">
+            <a class="navbar-brand" href="/?page=home"><img src="<?= $config['logo'] ?>" height="55px" width="auto"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <i class="fa-solid fa-bars"></i>
+                <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <?php
@@ -101,85 +97,68 @@ $static = $get_static->fetch(PDO::FETCH_ASSOC);
                 ?>
                 <ul class="navbar-nav mx-auto me-auto mb-2 mb-lg-3">
                     <li class="nav-item align-self-center ms-lg-3">
-                        <a class="nav-link underline-active align-self-center text-main" aria-current="page" href="/?page=home"><img src="assets/icon/house.png" width="20" class="mb-1">&nbsp;หน้าหลัก</a>
+                        <a class="nav-link underline-active align-self-center" aria-current="page" href="/?page=home"><img src="assets/icon/house.png" width="20" class="mb-1">&nbsp;หน้าหลัก</a>
                     </li>
-
-                    <!--   <li class="nav-item align-self-center ms-lg-3">
-                        <a class="nav-link underline-active align-self-center text-white" aria-current="page" href="?page=shop"><img src="assets/icon/shopping-cart.png" width="20" class="mb-1">&nbsp;ซื้อสินค้า</a>
-                    </li>
-                    <li class="nav-item align-self-center ms-lg-3">
-                        <a class="nav-link underline-active align-self-center text-white" aria-current="page" href="?page=random_wheel"><img src="assets/icon/wheel.png" width="20" class="mb-1">&nbsp;สุ่มรางวัล</a>
-                    </li> -->
-
                     <ul class="nav-item align-self-center">
                         <li class="nav-item dropdown" style="list-style: none;">
-                            <a class="nav-link align-self-center text-main" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="assets/icon/store.png" width="20" class="mb-1">&nbsp;ร้านค้า</a>
+                            <a class="nav-link dropdown-toggle align-self-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="assets/icon/store.png" width="20" class="mb-1">&nbsp;ร้านค้า</a>
                             <ul class="dropdown-menu shadow-sm p-4 pt-2 pb-2" style="border-radius: 0px;" aria-labelledby="navbarDropdown">
                                 <li>
-                                    <a class="dropdown-item text-main mb-1" href="?page=shop"><small><img src="assets/icon/shopping-cart.png" width="20" class="mb-1">&nbsp;ซื้อสินค้า</small></a>
+                                    <a class="dropdown-item text-dark mb-1" href="?page=shop"><small><img src="assets/icon/shopping-cart.png" width="20" class="mb-1">&nbsp;ซื้อสินค้า</small></a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item text-main mb-1" href="?page=spin"><small><img src="assets/icon/wheel.png" width="20" class="mb-1">&nbsp;สุ่มของ</small></a>
+                                    <a class="dropdown-item text-dark mb-1" href="?page=random_wheel"><small><img src="assets/icon/wheel.png" width="20" class="mb-1">&nbsp;สุ่มของ</small></a>
                                 </li>
                             </ul>
                         </li>
                     </ul>
-
                     <li class="nav-item align-self-center ms-lg-3">
-                        <a class="nav-link underline-active align-self-center text-main" aria-current="page" href="/?page=payment"><img src="assets/icon/prepaid-card.png" width="20" class="mb-1">&nbsp;เติมเงิน</a>
+                        <a class="nav-link underline-active align-self-center" aria-current="page" href="/?page=payment"><img src="assets/icon/credit.png" width="20" class="mb-1">&nbsp;เติมเงิน</a>
                     </li>
-               
-	
-                        <li class="nav-item align-self-center ms-lg-3">
-                            <a class="nav-link underline-active align-self-center text-main" aria-current="page"
-                                href="https://www.facebook.com/profile.php?id=100067397242711&mibextid=ZbWKwL"><img src="assets/icon/call-center.png" width="20"
-                                    class="mb-1">&nbsp;ช่องทางติดต่อ</a>
-                        </li>
-                </ul>              
+                    <li class="nav-item align-self-center ms-lg-3">
+                        <a class="nav-link underline-active align-self-center" aria-current="page" href="/?page=history"><img src="assets/icon/history.png" width="20" class="mb-1">&nbsp;ประวัติทั้งหมด</a>
+                    </li>
+                    
+                </ul>
                 <?php
                 if (!isset($_SESSION['id'])) {
                 ?>
                     <ul class="navbar-nav ms-auto  mb-2 mb-lg-0 ">
                         <li class="nav-item ms-3 mb-2 align-self-center">
-                            <a class="nav-link underline-active align-self-center text-main" aria-current="page" href="?page=login"><img src="assets/icon/profile.png" width="20" class="mb-1">&nbsp;เข้าสู่ระบบ</a>
+                            <a class="nav-link underline-active align-self-center" aria-current="page" href="?page=login"><img src="assets/icon/profile.png" width="20" class="mb-1">&nbsp;เข้าสู่ระบบ</a>
                         </li>
                         <li class="nav-item ms-3 mb-2 align-self-center">
-                            <a class="nav-link underline-active align-self-center text-main" aria-current="page" href="?page=register"><img src="assets/icon/add-user.png" width="20" class="mb-1">&nbsp;สมัครสมาชิก</a>
+                            <a class="nav-link underline-active align-self-center" aria-current="page" href="?page=register"><img src="assets/icon/add-user.png" width="20" class="mb-1">&nbsp;สมัครสมาชิก</a>
                         </li>
                     </ul>
                 <?php
                 } else {
                 ?>
-                    <!-- <ul class="navbar-nav ms-auto mb-2 mb-lg-0 ">
-                        <li class="nav-item align-self-center ms-lg-3">
-                            <a class="nav-link underline-active align-self-center text-main" aria-current="page" href="/?page=profile"><img src="assets/icon/profile.png" width="20" class="mb-1">&nbsp;โปรไฟล์ : <?php echo htmlspecialchars(strtoupper($user['username'])); ?></a>
-                        </li>
-                    </ul> -->
                     <ul class="navbar-nav ms-auto  mb-2 mb-lg-0 ">
                         <li class="nav-item dropdown" style="list-style: none;">
-                            <a class="nav-link active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="assets/icon/profile.png" width="20" class="mb-1"></i>&nbsp; <?php echo htmlspecialchars(strtoupper($user['username'])); ?>
+                            <a class="nav-link active dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="assets/icon/profile.png" width="20" class="mb-1"></i>&nbsp; <?php echo htmlspecialchars(strtoupper($user['username'])); ?>
                             </a>
                             <ul class="dropdown-menu shadow-sm p-4 pt-2 pb-2" style="border-radius: 0px;" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item text-dark mb-1"><small><img src="assets/icon/dollar.png" width="20" class="mb-1">&nbsp;&nbsp;ยอดคงเหลือ : <?php echo number_format($user["point"]); ?></small></a></li>
                                 <div class="dropdown-divider"></div>
-                                <li><a class="dropdown-item text-main mb-1" href="?page=profile"><small><img src="assets/icon/profile.png" width="20" class="mb-1">&nbsp;&nbsp;ข้อมูลส่วนตัว</small></a></li>
-								
-<li><a class="dropdown-item text-main mb-1" href="?page=history"><small><img src="assets/icon/history.png" width="20" class="mb-1">&nbsp;&nbsp;ประวัติทั้งหมด</small></a></li>
+                                <li><a class="dropdown-item text-dark mb-1" href="?page=profile"><small><img src="assets/icon/profile.png" width="20" class="mb-1">&nbsp;&nbsp;ข้อมูลส่วนตัว</small></a></li>
+
                                 <?php
                                 if ($user["rank"] == "1") {
                                 ?>
-                                    <li><a class="dropdown-item text-main mb-1" href="?page=backend"><small><img src="assets/icon/manager.png" width="20" class="mb-1">&nbsp;จัดการหลังร้าน</small></a></li>
+                                    <li><a class="dropdown-item text-dark mb-1" href="?page=backend"><small><img src="assets/icon/manager.png" width="20" class="mb-1">&nbsp;จัดการหลังร้าน</small></a></li>
                                 <?php
                                 }
                                 ?>
 
                                 <div class="dropdown-divider"></div>
-                                <li><a class="dropdown-item text-main mb-2" href="?page=logout"><small><img src="assets/icon/enter.png" width="20" class="mb-1">&nbsp;ออกจากระบบ</small></a></li>
+                                <li><a class="dropdown-item text-dark mb-2" href="?page=logout"><small><img src="assets/icon/enter.png" width="20" class="mb-1">&nbsp;ออกจากระบบ</small></a></li>
                             </ul>
                         </li>
                     </ul>
+
                 <?php
                 }
                 ?>
@@ -187,7 +166,7 @@ $static = $get_static->fetch(PDO::FETCH_ASSOC);
         </div>
     </nav>
     <?php
-      function admin($user)
+    function admin($user)
     {
         if (isset($_SESSION['id']) && $user["rank"] == "1") {
             return true;
@@ -263,7 +242,7 @@ $static = $get_static->fetch(PDO::FETCH_ASSOC);
         } else {
             require_once('page/login.php');
         }
-    } elseif (isset($_GET['page']) && $_GET['page'] == "spin") {
+    } elseif (isset($_GET['page']) && $_GET['page'] == "random_wheel") {
         if (isset($_SESSION['id'])) {
             require_once('page/random_wheel.php');
         } else {
@@ -301,7 +280,7 @@ $static = $get_static->fetch(PDO::FETCH_ASSOC);
         require_once('page/backend/menu_manage.php');
     } elseif (admin($user) && isset($_GET['page']) && $_GET['page'] == "user_edit") {
         require_once('page/backend/menu_manage.php');
-    } elseif (admin($user) && isset($_GET['page']) && $_GET['page'] == "angpao_manage") {
+    } elseif (admin($user) && isset($_GET['page']) && $_GET['page'] == "topup_manage") {
         require_once('page/backend/menu_manage.php');
     } elseif (admin($user) && isset($_GET['page']) && $_GET['page'] == "product_manage") {
         require_once('page/backend/menu_manage.php');
@@ -323,12 +302,10 @@ $static = $get_static->fetch(PDO::FETCH_ASSOC);
         require_once('page/backend/menu_manage.php');
     } elseif (admin($user) && isset($_GET['page']) && $_GET['page'] == "backend_topup_history") {
         require_once('page/backend/menu_manage.php');
-   } elseif (admin($user) && isset($_GET['page']) && $_GET['page'] == "carousel_manage") {
+    } elseif (admin($user) && isset($_GET['page']) && $_GET['page'] == "carousel_manage") {
         require_once('page/backend/menu_manage.php');
     } elseif (admin($user) && isset($_GET['page']) && $_GET['page'] == "recom_manage") {
         require_once('page/backend/menu_manage.php');
-		} elseif (admin($user) && isset($_GET['page']) && $_GET['page'] == "allmonney") {
-        require_once('page/backend/moneyontop.php');
     } elseif (admin($user) && isset($_GET['page']) && $_GET['page'] == "crecom_manage") {
         require_once('page/backend/menu_manage.php');
     } elseif (admin($user) && isset($_GET['page']) && $_GET['page'] == "website") {
@@ -336,7 +313,8 @@ $static = $get_static->fetch(PDO::FETCH_ASSOC);
     } else {
         require_once('page/simple.php');
     }
-    ?>    <div class="modal fade" id="buy_count" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    ?>
+    <div class="modal fade" id="buy_count" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -374,56 +352,45 @@ $static = $get_static->fetch(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
-    <br />
-    <!-- on -->
+    <br/>
     <footer class="bg-white shadow pt-3">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 col-lg-3 text-center mb-3">
-                    <img src="<?php echo $config['logo']; ?>" width="200">
-                    <br><?php echo $config['name']; ?><br>
-                    <h5></h5>
-                    <p><?php echo $config['des']; ?></p>
-                </div>
-                <div class="col-12 col-lg-2 text-center mb-3">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-lg-4 text-center mb-3">
+                        <img src="<?php echo $config['logo']; ?>" width="200">
+                        <br><?php echo $config['name']; ?><br>
+                        <h5></h5>
+                        <p><?php echo $config['des']; ?></p>
+                    </div>
+                    <div class="col-12 col-lg-2 text-center mb-3">
+                        <h5>ช่วยเหลือ</h5>
+                        <a href="/?page=home" style="text-decoration: none;" class="text-black"><i class="fa-regular fa-house"></i> หน้าหลัก</a><br>
+                        <a href="/?page=payment" style="text-decoration: none;" class="text-black"><i class="fa-regular fa-coins"></i> เติมเงิน</a><br>
+                        <a href="/?page=redeem" style="text-decoration: none;" class="text-black"><i class="fa-solid fa-code"></i> เติมโค้ด</a><br>
+                        <a href="/?page=history" style="text-decoration: none;" class="text-black"><i class="fa-solid fa-clock-rotate-left"></i> ประวัติทั้งหมด</a><br>
+                    </div>
+                    <div class="col-12 col-lg-2 text-center mb-3">
+                        <h5>ช่องทางการติดต่อ</h5>
+                        <a href="<?php echo $config['contact2']; ?>" style="text-decoration: none;" class="text-black"><i class="fa-brands fa-facebook"></i> Facebook</a><br>
+                        <a href="<?php echo $config['contact']; ?>" style="text-decoration: none;" class="text-black"><i class="fa-brands fa-discord"></i> Discord</a><br>
+                    </div>
 
+                    <div class="col-12 col-lg-4 text-center mb-3">
+                        <div id="fb-root"></div>
+                        <script async defer crossorigin="anonymous" src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v16.0" nonce="ExHRiLWq"></script>
+                        <center>
+                            <div class="mb-3 fb-page" data-href="<?php echo $config['facebook']; ?>" data-tabs="timeline" data-width="320" data-height="70" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/facebook" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/facebook">Facebook</a></blockquote></div>
+                            <br>
+                            <iframe src="https://discord.com/widget?id=<?php echo $config['widget_discord']; ?>&amp;theme=dark" width="320" height="350" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+                        </center>
+                    </div>
                 </div>
-                <div class="col-5 col-lg-2 text-center mb-5">
-                    <h5>ช่องทางการติดต่อ</h5>
-                    <a href="<?php echo $config['contact2']; ?>" style="text-decoration: none;" class="text-black"><i class="fa-brands fa-facebook"></i> Facebook</a><br>
-                    <a href="<?php echo $config['contact']; ?>" style="text-decoration: none;" class="text-black"><i class="fa-brands fa-discord"></i> Discord</a><br>
-                </div>
-
-                <div class="col-12 col-lg-4 text-center mb-3">
-                    <div id="fb-root"></div>
-                    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v16.0" nonce="ExHRiLWq"></script>
-                    <center>
-                        <div class="mb-3 fb-page" data-href="<?php echo $config['facebook']; ?>" data-tabs="timeline" data-width="320" data-height="70" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
-                            <blockquote cite="https://www.facebook.com/facebook" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/facebook">Facebook</a></blockquote>
-                        </div>
-                        <br>
-                        <iframe src="https://discord.com/widget?id=<?php echo $config['widget_discord']; ?>&amp;theme=dark" width="320" height="350" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-                    </center>
-                </div>
-            </div>
-            <hr>
-            <div class="container-fluid pt-3 pb-3">
-                <center>
-                    <p class="text-dark mb-1 "><strong><i class="fa-regular fa-copyright"></i>&nbsp; 2023 <?php echo $config['name']; ?>, All right reserved.</strong></p>
-                    <small class="text-dark mb-1 "></i>&nbsp; Create By zixca x & Flash Shop.<a href="https://discord.gg/ki9" class="text-dark mb-1"><i class="fa-solid fa-triangle-exclamation fa-fade"></i>&nbsp;ติดต่อเจ้าของร้านไม่ได้ / แจ้งปัญหาร้านค้าโกง</a></small>
-                </center>
-            </div>
-        </div>
-    </footer>
-
-    <!-- off -->
-    <!--<div class="container-fluid pt-3 pb-3">
+                <hr>
         <center>
-            <p class="text-main mb-1 "><strong><i class="fa-regular fa-copyright"></i>&nbsp; 2023 <?php echo $config['name']; ?>, All right reserved.</strong></p>
-            <small class="text-main mb-1 "></i>&nbsp; ZIXCA X & ASNZ CLOUD.<a href="https://discord.gg/ki9" class="text-main mb-1"><i class="fa-solid fa-triangle-exclamation fa-fade"></i>&nbsp;ติดต่อเจ้าของร้านไม่ได้ / แจ้งปัญหาร้านค้าโกง</a></small>
+            <p class="text-dark mb-1"><strong><i class="fa-regular fa-copyright"></i>&nbsp; 2023 <?php echo $config['name']; ?>, All right reserved.</strong></p>
+            <small class="text-dark "></i><i class="fa-solid fa-cog fa-spin"></i>&nbsp; Create By SongKran & Sxdd.<a href="https://discord.gg/overdrive-c" class="text-dark"> ติดต่อเจ้าของร้านไม่ได้ / แจ้งปัญหาร้านค้าโกง</a></small>
         </center>
-    </div> -->
-
+    </div>
     <script>
         async function shake_alert(status, result) {
             if (status) {
@@ -511,7 +478,19 @@ $static = $get_static->fetch(PDO::FETCH_ASSOC);
     </script>
     <script>
         AOS.init();
+        // var options = {
+        //     strings: [`<?php //echo $s_info['des']; 
+                            ?>`],
+        //     typeSpeed: 40,
+        //     color: "#fff"
+        // };
+        // var typed = new Typed('#typing', options);
     </script>
 </body>
 
 </html>
+<?php
+} else {
+    require_once('home.php');
+}
+?>
